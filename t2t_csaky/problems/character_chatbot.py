@@ -33,6 +33,10 @@ class CharacterChatbot(word_chatbot.WordChatbot):
     return True
 
   @property
+  def vocab_type(self):
+    return text_problems.VocabType.CHARACTER
+
+  @property
   def targeted_vocab_size(self):
     return 0
 

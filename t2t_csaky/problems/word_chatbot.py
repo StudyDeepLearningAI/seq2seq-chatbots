@@ -8,6 +8,7 @@ import os
 
 # tensor2tensor imports
 from tensor2tensor.data_generators import problem
+from tensor2tensor.data_generators import text_problems
 from tensor2tensor.data_generators import text_encoder
 from tensor2tensor.utils import registry
 
@@ -18,30 +19,38 @@ FLAGS = tf.flags.FLAGS
 EOS = text_encoder.EOS_ID
 
 
-class WordChatbot(problem.Text2TextProblem):
+class WordChatbot(text_problems.Text2TextProblem):
   """
   An abstract base class for word based chatbot problems.
   """
 
   @property
-  def is_character_level(self):
-    return False
+  def dataset_splits(self):
+    return [{
+      "split": problem.DatasetSplit.TRAIN,
+      "shards": 1,
+      "size": 80,
+    }, {
+      "split": problem.DatasetSplit.EVAL,
+      "shards": 1,
+      "size": 10,
+    }, {
+      "split": problem.DatasetSplit.TEST,
+      "shards": 1,
+      "size": 10,
+    }]
 
   @property
-  def num_shards(self):
-    return 1
-
-  @property
-  def num_dev_shards(self):
-    return 1
+  def is_generate_per_split(self):
+    return True
 
   @property
   def vocab_name(self):
     return "vocab.chatbot"
 
   @property
-  def use_subword_tokenizer(self):
-    return False
+  def vocab_type(self):
+    return text_problems.VocabType.TOKEN
 
   @property
   def input_space_id(self):
@@ -60,10 +69,6 @@ class WordChatbot(problem.Text2TextProblem):
     # number of utterance pairs in the full dataset
     # if it's 0, then the full size of the dataset is used
     return NotImplementedError
-
-  @property
-  def dataset_split(self):
-    return {"train":80,"val":10,"test":10}
 
   @property
   def data_dir(self):
@@ -111,7 +116,7 @@ class WordChatbot(problem.Text2TextProblem):
     return NotImplementedError
 
   # This function generates the train and validation pairs in t2t-datagen style
-  def generator(self, data_dir, tmp_dir, train):
+  def generate_samples(self, data_dir, tmp_dir, train):
     """ 
     The function assumes that if you have data at one level of the pipeline, you 
     don't want to re-generate it, so for example if the 4 txt files exist, the function
@@ -125,7 +130,13 @@ class WordChatbot(problem.Text2TextProblem):
     """
 
     # determine whether we are in training or validation mode
-    mode = "train" if train else "dev"
+    if train==problem.DatasetSplit.TRAIN:
+      mode="train"
+    elif train==problem.DatasetSplit.EVAL:
+      mode="dev"
+    else:
+      mode="test"
+
     print("t2t_csaky_log: "+mode+" data generation activated.")
     self.data_dir=data_dir
     sourcePath=os.path.join(data_dir, mode+"Source.txt")
@@ -137,7 +148,7 @@ class WordChatbot(problem.Text2TextProblem):
     # create a t2t symbolizer vocab from
     symbolizer_vocab = text_encoder.TokenTextEncoder(os.path.join(data_dir, self.vocab_file),
                                                     num_reserved_ids=0,
-                                                    replace_oov="<UNK>")
+                                                    replace_oov="<unk>")
 
     return self.token_generator(sourcePath,targetPath,symbolizer_vocab, EOS)
 
