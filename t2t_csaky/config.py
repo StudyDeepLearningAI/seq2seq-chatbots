@@ -5,7 +5,7 @@ for the current run. This file will also be copied to the provided directory.
 
 FLAGS={
   "t2t_usr_dir"       :"t2t_csaky", # tensor2tensor imports from this dir
-  "data_dir"          :"data_dir/DailyDialog/base_both_avg_embedding_clustering_train",
+  "data_dir"          :"data_dir/DailyDialog/base_both_avg_embedding_clustering",
   "train_dir"         :"train_dir/DailyDialog/trf_base-both_avg_embedding_clustering",
   "decode_dir"        :"decode_dir/DailyDialog/trf_20_dropout-base",
   "problem"           :"daily_dialog_chatbot",
@@ -36,7 +36,7 @@ FLAGS={
 DATA_FILTERING={
   "data_dir"          :"data_dir/DailyDialog/base_with_numbers/filtered_data/avg_embedding_clustering",
   "filter_problem"    :"avg_embedding",  # can be: hash_jaccard, sentence_embedding, rnn_state
-  "filter_type"       :"target_based",  # can be: target_based, source_based, both
+  "filter_type"       :"both",  # can be: target_based, source_based, both
   "source_clusters"   :0,
   "target_clusters"   :0,
   "max_length"        :0,    # max length when constructing bigram matrix, this needs to be set to 0 in order to normal filtering to run

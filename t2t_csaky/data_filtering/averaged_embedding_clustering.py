@@ -28,12 +28,12 @@ class AverageWordEmbedding(SemanticClustering):
       self.generate_average_word_embeddings(
         os.path.join(project_path,
                      self._data_path('vocab')),
-        self._data_path(self.tag + data_tag, '.txt'),
-        self.paths[data_tag])
+        self._data_path(data_tag, '.txt'),
+        self.paths[data_tag]['npy'])
 
     meaning_vectors = np.load(self.paths[data_tag]['npy'])
 
-    with open(self._data_path(self.tag + data_tag, '.txt'), 'r',
+    with open(self._data_path(data_tag, '.txt'), 'r',
                 encoding='utf-8') as file:
 
       for index, line in enumerate(file):
